@@ -7,21 +7,20 @@ import { Eye, EyeOff, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import loginImage from "../../public/assets/images/auth.svg";
-import logo from "../../public/assets/images/logo.png";
+import loginImage from "../../../public/assets/images/auth.svg";
+import logo from "../../../public/assets/images/logo.png";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login delay
+    // Simulate registration delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsLoading(false);
@@ -30,10 +29,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full font-sans">
-      {/* Left Column - Hero Section */}
+      {/* Left Column - Brand Section (Identical to Login) */}
       <div className="hidden lg:flex w-1/2 bg-[#317C74] flex-col justify-between p-12 text-white relative overflow-hidden">
-        {/* Decorative Circles/Background Elements could go here */}
-
         {/* Logo */}
         <div className="flex items-center gap-3">
           <Image src={logo} alt="Logo" />
@@ -45,7 +42,7 @@ export default function LoginPage() {
             Kelola Kelas dan Perkembangan Siswa dengan Mudah.
           </h1>
           <p className="text-teal-100 text-lg mb-12">
-            Masuk untuk mengakses dashboard pembelajaran dan memantau progres
+            Daftar untuk mengakses dashboard pembelajaran dan memantau progres
             setiap siswa.
           </p>
 
@@ -73,16 +70,35 @@ export default function LoginPage() {
       </div>
 
       {/* Right Column - Form Section */}
-      <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center p-8 sm:p-12">
-        <div className="w-full max-w-[400px] space-y-8">
+      <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center p-8 sm:p-12 overflow-y-auto">
+        <div className="w-full max-w-[450px] space-y-8 my-auto">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-neutral">Selamat Datang!</h2>
-            <p className="text-slate-500">
-              Akses data belajar dan perkembangan kelas Anda.
+            <h2 className="text-3xl font-bold text-neutral">
+              Daftar Akun Baru
+            </h2>
+            <p className="text-slate-500 text-sm">
+              Daftar sekarang untuk mulai menggunakan layanan kami dengan lebih
+              mudah sejak hari pertama.
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleRegister} className="space-y-4">
+            <div className="space-y-2">
+              <label
+                className="text-sm font-semibold text-neutral"
+                htmlFor="name"
+              >
+                Nama Lengkap
+              </label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Masukkan nama lengkap Anda"
+                className="h-11 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74]"
+                required
+              />
+            </div>
+
             <div className="space-y-2">
               <label
                 className="text-sm font-semibold text-neutral"
@@ -94,9 +110,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="Masukkan email Anda"
-                className="h-12 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74]"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                className="h-11 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74]"
                 required
               />
             </div>
@@ -113,9 +127,7 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Masukkan kata sandi Anda"
-                  className="h-12 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74] pr-10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-11 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74] pr-10"
                   required
                 />
                 <button
@@ -130,32 +142,50 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
-              <div className="flex justify-end">
-                <Link
-                  href="/forgot-password"
-                  className="text-sm font-medium text-slate-400 hover:text-[#317C74]"
+            </div>
+
+            <div className="space-y-2">
+              <label
+                className="text-sm font-semibold text-neutral"
+                htmlFor="confirm-password"
+              >
+                Konfirmasi Kata Sandi
+              </label>
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Masukkan ulang kata sandi Anda"
+                  className="h-11 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74] pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
-                  Lupa Kata Sandi?
-                </Link>
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
             </div>
 
             <Button
               type="submit"
-              className="w-full h-12 bg-[#317C74] hover:bg-[#2A6B63] text-white text-base font-bold rounded-lg transition-all"
+              className="w-full h-12 bg-[#317C74] hover:bg-[#2A6B63] text-white text-base font-bold rounded-lg transition-all mt-4"
               disabled={isLoading}
             >
-              {isLoading ? "Memuat..." : "Masuk"}
+              {isLoading ? "Memproses..." : "Daftar"}
             </Button>
           </form>
 
           <div className="text-center text-sm text-slate-500">
-            Belum memiliki akun?{" "}
-            <Link
-              href="/register"
-              className="font-bold text-neutral hover:underline"
-            >
-              Daftar
+            Sudah Memiliki Akun?{" "}
+            <Link href="/" className="font-bold text-[#317C74] hover:underline">
+              Masuk
             </Link>
           </div>
         </div>
