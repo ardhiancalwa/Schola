@@ -37,12 +37,28 @@ export async function createClassWithStudents(payload: CreateClassPayload) {
   const supabase = await createClient();
 
   // 1. Validate Session
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (userError || !user) {
     return { success: false, message: "Unauthorized: Please login first." };
+  }
+
+  // 1.5. Ensure User Exists in Public Table (Lazy Sync)
+  // This fixes the foreign key constraint error if the user is missing from public.users
+  const { error: syncError } = await supabase
+    .from("users")
+    .upsert({
+      id: user.id,
+      email: user.email!,
+      full_name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+      avatar_url: user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email || "User")}&background=random`,
+      is_verified: true, // Assuming valid session means verified enough for this basic sync
+    }, { onConflict: "id" });
+
+  if (syncError) {
+    console.error("Supabase Error (User Sync):", syncError);
+     // Proceeding anyway, hoping it might just be a duplicate key race condition or similar which is fine due to upsert. 
+     // But if it fails hard (e.g. schema mismatch), the next step will fail anyway.
   }
 
   const { classData, studentsData } = payload;
