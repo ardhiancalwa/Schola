@@ -39,9 +39,9 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-screen w-[280px] flex-col justify-between border-r border-slate-100 bg-white p-6 font-sans">
+    <div className="flex h-auto w-[280px] flex-col border-r border-slate-100 bg-white p-6 font-sans">
       {/* Top Section */}
-      <div className="space-y-8">
+      <div className="space-y-8 pb-4">
         {/* Logo */}
         <div className="flex items-center gap-2 px-2">
           <Image src={logo} alt="Logo" />

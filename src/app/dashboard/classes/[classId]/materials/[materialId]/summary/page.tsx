@@ -112,7 +112,7 @@ export default function MaterialSummaryPage({
   const { classId } = use(params);
 
   return (
-    <div className="p-6 md:p-10 font-sans max-w-5xl mx-auto space-y-8 pb-32">
+    <div className="font-sans max-w-full space-y-8 pb-32">
       {/* 1. Header & Meta */}
       <div className="space-y-6">
         <div className="flex flex-col gap-2">

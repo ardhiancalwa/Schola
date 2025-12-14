@@ -1,12 +1,13 @@
+
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { StudentNeedHelpItem } from "@/lib/actions/report";
 
-const students = [
-  { name: "Reno Renaldi", score: 65, tasks: "28/30" },
-  { name: "Reno Renaldi", score: 65, tasks: "28/30" }, // Duplicate for dummy data as requested
-  { name: "Reno Renaldi", score: 65, tasks: "28/30" },
-];
+interface StudentNeedsHelpProps {
+  students: (StudentNeedHelpItem & { tasks: string })[];
+}
 
-export function StudentNeedsHelp() {
+export function StudentNeedsHelp({ students }: StudentNeedsHelpProps) {
   return (
     <Card className="shadow-sm border-none rounded-xl h-full">
       <CardHeader>

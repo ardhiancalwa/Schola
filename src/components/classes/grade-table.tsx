@@ -1,15 +1,5 @@
-"use client";
-
-import {
-  Search,
-  ChevronDown,
-  MonitorUp,
-  Trash2,
-  Pencil,
-  Sparkles,
-} from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -19,113 +9,60 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { ClassSearchInput } from "./class-search-input";
+import { ClassExportButton } from "./class-export-button";
+import { StudentActionButtons } from "./student-action-buttons";
+import { NumericPagination } from "./numeric-pagination";
 
-const STUDENTS = [
-  {
-    id: "1",
-    nis: "5022814693",
-    name: "Chintia Putri",
-    attendance: 95,
-    t1: 90,
-    t2: 90,
-    uts: 80,
-    uas: null,
-    final: 89,
-  },
-  {
-    id: "2",
-    nis: "5022814693", // Using same NIS as per dummy data request/image
-    name: "Chintia Putri",
-    attendance: 90,
-    t1: 85,
-    t2: 85,
-    uts: 80,
-    uas: null,
-    final: 82,
-  },
-  {
-    id: "3",
-    nis: "5022814693",
-    name: "Chintia Putri",
-    attendance: 80,
-    t1: 80,
-    t2: 80,
-    uts: 80,
-    uas: null,
-    final: 89,
-  },
-  {
-    id: "4",
-    nis: "5022814693",
-    name: "Chintia Putri",
-    attendance: 80,
-    t1: 80,
-    t2: 80,
-    uts: 80,
-    uas: null,
-    final: 80,
-  },
-  {
-    id: "5",
-    nis: "5022814693",
-    name: "Chintia Putri",
-    attendance: 75,
-    t1: 80,
-    t2: 80,
-    uts: 80,
-    uas: null,
-    final: 80,
-  },
-  {
-    id: "6",
-    nis: "5022814693",
-    name: "Chintia Putri",
-    attendance: 70,
-    t1: 75,
-    t2: 75,
-    uts: 70,
-    uas: null,
-    final: 73,
-  },
-  {
-    id: "7",
-    nis: "5022814693",
-    name: "Chintia Putri",
-    attendance: 65,
-    t1: 65,
-    t2: 70,
-    uts: 70,
-    uas: null,
-    final: 68,
-  },
-];
+interface ProcessedStudent {
+  id: string;
+  nis: string;
+  name: string;
+  gender: string;
+  attendancePct: number;
+  tugas_1: string | number;
+  tugas_2: string | number;
+  uts: string | number;
+  uas: string | number;
+  nilai_akhir: string | number;
+  semester: string;
+}
 
-export function GradeTable() {
+interface GradeTableProps {
+  students: ProcessedStudent[];
+  allStudentsForExport: any[];
+  totalStudents: number;
+  currentPage: number;
+  totalPages: number;
+  classId: string;
+}
+
+export function GradeTable({
+  students = [],
+  allStudentsForExport = [],
+  totalStudents = 0,
+  currentPage = 1,
+  totalPages = 1,
+  classId,
+}: GradeTableProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
       {/* Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="relative w-full md:w-[350px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Temukan siswa berdasarkan Nama atau NIS"
-              className="pl-10 rounded-full border-slate-200 bg-transparent focus-visible:ring-[#317C74]"
-            />
-          </div>
+          {/* Client Component: Search Input */}
+          <ClassSearchInput />
+
           <Button
             variant="outline"
             className="rounded-full border-slate-200 text-[#317C74] font-medium gap-2 hidden sm:flex"
           >
-            <MonitorUp className="w-4 h-4" /> Nilai Terbesar
+            <ChevronsUpDown className="w-4 h-4" /> Nilai Terbesar
           </Button>
         </div>
 
-        {/* User requested Action button in Page Header, but also potentially here. 
-            Keeping toolbar clean or moving Export Here if needed. 
-            For now, following the specific "Students Table" reqs from prompt which matches standard table toolbar.
-        */}
+        {/* Client Component: Export Button */}
+        <ClassExportButton data={allStudentsForExport} classId={classId} />
       </div>
 
       {/* Table */}
@@ -133,7 +70,7 @@ export function GradeTable() {
         <Table>
           <TableHeader className="bg-slate-50/50">
             <TableRow>
-              <TableHead className="w-[120px] font-bold text-slate-500">
+              <TableHead className="w-[120px] font-bold text-slate-500 text-center">
                 NIS
               </TableHead>
               <TableHead className="font-bold text-slate-500 min-w-[200px]">
@@ -163,128 +100,92 @@ export function GradeTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {STUDENTS.map((student, idx) => (
-              <TableRow key={idx}>
-                <TableCell className="font-medium text-slate-500">
-                  {student.nis}
-                </TableCell>
-                <TableCell className="font-medium text-neutral">
-                  {student.name}
-                </TableCell>
-
-                {/* Kehadiran */}
-                <TableCell className="text-center font-medium">
-                  <span
-                    className={cn(
-                      student.attendance >= 80
-                        ? "text-[#317C74]"
-                        : "text-red-500"
-                    )}
-                  >
-                    {student.attendance}%
-                  </span>
-                </TableCell>
-
-                {/* Scores */}
-                {[student.t1, student.t2, student.uts].map((score, i) => (
-                  <TableCell
-                    key={i}
-                    className="text-center font-medium text-slate-600"
-                  >
+            {students.length > 0 ? (
+              students.map((student) => (
+                <TableRow key={student.id} className="hover:bg-slate-50">
+                  <TableCell className="font-medium text-slate-500 text-center">
+                    {student.nis || "-"}
+                  </TableCell>
+                  <TableCell className="font-medium text-neutral">
+                    {student.name}
+                  </TableCell>
+                  <TableCell className="text-center font-medium">
                     <span
                       className={cn(
-                        score >= 75 ? "text-[#317C74]" : "text-red-500"
+                        (student.attendancePct ?? 0) >= 80
+                          ? "text-[#317C74]"
+                          : "text-red-500"
                       )}
                     >
-                      {score}
+                      {student.attendancePct ?? 0}%
                     </span>
                   </TableCell>
-                ))}
 
-                {/* UAS (Null handling) */}
-                <TableCell className="text-center font-medium text-slate-400">
-                  {student.uas ?? "-"}
-                </TableCell>
+                  {/* Grades */}
+                  <TableCell className="text-center font-medium text-slate-600">
+                    <ScoreBadge value={student.tugas_1} />
+                  </TableCell>
+                  <TableCell className="text-center font-medium text-slate-600">
+                    <ScoreBadge value={student.tugas_2} />
+                  </TableCell>
+                  <TableCell className="text-center font-medium text-slate-600">
+                    <ScoreBadge value={student.uts} />
+                  </TableCell>
+                  <TableCell className="text-center font-medium text-slate-600">
+                    <ScoreBadge value={student.uas} />
+                  </TableCell>
 
-                {/* Final Score */}
-                <TableCell className="text-center font-bold">
-                  <span
-                    className={cn(
-                      student.final >= 75 ? "text-[#317C74]" : "text-red-500"
-                    )}
-                  >
-                    {student.final}
-                  </span>
-                </TableCell>
-
-                {/* Actions */}
-                <TableCell className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-slate-400 hover:text-blue-500"
+                  {/* Nilai Akhir */}
+                  <TableCell className="text-center font-bold">
+                    <span
+                      className={cn(
+                        (typeof student.nilai_akhir === "number"
+                          ? student.nilai_akhir
+                          : 0) >= 75
+                          ? "text-[#317C74]"
+                          : student.nilai_akhir === "-"
+                          ? "text-slate-400"
+                          : "text-red-500"
+                      )}
                     >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-slate-400 hover:text-red-500"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                      {student.nilai_akhir ?? "0"}
+                    </span>
+                  </TableCell>
+
+                  {/* Aksi */}
+                  <TableCell className="text-center">
+                    <StudentActionButtons student={student} classId={classId} />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={9}
+                  className="h-24 text-center text-slate-500"
+                >
+                  Tidak ada data siswa.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between mt-6">
-        <p className="text-sm text-slate-500">
-          Menampilkan 1 - 5 dari total data
-        </p>
-        <div className="flex gap-1.5">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 text-slate-400 rounded-lg hover:bg-slate-50"
-            disabled
-          >
-            <ChevronDown className="w-4 h-4 rotate-90" />
-          </Button>
-          <Button
-            size="icon"
-            className="h-8 w-8 bg-[#317C74] rounded-full text-white hover:bg-[#2A6B63] shadow-md shadow-teal-700/20"
-          >
-            1
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 text-slate-500 rounded-full hover:bg-slate-100"
-          >
-            2
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 text-slate-500 rounded-full hover:bg-slate-100"
-          >
-            3
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 text-slate-400 rounded-lg hover:bg-slate-50"
-          >
-            <ChevronDown className="w-4 h-4 -rotate-90" />
-          </Button>
-        </div>
-      </div>
+      <NumericPagination currentPage={currentPage} totalPages={totalPages} />
     </div>
+  );
+}
+
+function ScoreBadge({ value }: { value: string | number }) {
+  if (value === "-" || value === null || value === undefined)
+    return <span className="text-slate-400">-</span>;
+  const numCheck = Number(value);
+  const isGood = !isNaN(numCheck) && numCheck >= 75;
+  return (
+    <span className={cn(isGood ? "text-[#317C74]" : "text-red-500")}>
+      {value}
+    </span>
   );
 }
