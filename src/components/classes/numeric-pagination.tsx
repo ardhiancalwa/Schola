@@ -8,25 +8,31 @@ import { cn } from "@/lib/utils";
 interface NumericPaginationProps {
   currentPage: number;
   totalPages: number;
+  onPageChange?: (page: number) => void;
 }
 
 export function NumericPagination({
   currentPage,
   totalPages,
+  onPageChange,
 }: NumericPaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", page.toString());
-    router.push(`${pathname}?${params.toString()}`);
+    if (onPageChange) {
+      onPageChange(page);
+    } else {
+      const params = new URLSearchParams(searchParams);
+      params.set("page", page.toString());
+      router.push(`${pathname}?${params.toString()}`);
+    }
   };
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  if (totalPages <= 1) return null;
+  // if (totalPages <= 1) return null;
 
   return (
     <div className="flex items-center justify-end gap-1.5 mt-6">

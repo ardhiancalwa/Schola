@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -17,99 +15,38 @@ import {
   Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { use } from "react";
+import { getAnalysis } from "@/lib/actions/summarizer";
+import { redirect } from "next/navigation";
+import { formatDistanceToNow } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 
-// --- Dummy Data ---
-const summaryData = {
-  meta: {
-    level: "SMA Kelas XI",
-    method: "Visual",
-    time: "2 Menit yang lalu",
-  },
-  file: {
-    name: "Pertidaksamaan Dua Variabel.PDF",
-    status: "File Berhasil Dianalisa",
-  },
-  summary: {
-    intro: (
-      <>
-        <span className="font-bold text-[#317C74]">
-          Pertidaksamaan dua variabel
-        </span>{" "}
-        merupakan bentuk hubungan matematika yang melibatkan dua variabel
-        (biasanya x dan y) dengan tanda ketidaksamaan. Materi ini digunakan
-        untuk menentukan daerah penyelesaian yang memenuhi suatu kondisi
-        tertentu dan sering direpresentasikan dalam bentuk grafik pada bidang
-        koordinat.
-      </>
-    ),
-    compare: [
-      {
-        title: "Pertidaksamaan Linear Dua Variabel",
-        theme: "yellow", // For styling logic
-        points: [
-          "Bentuk umum: ax + by < c, ax + by ≤ c, ax + by > c, ax + by ≥ c",
-          "Melibatkan dua variabel, biasanya x dan y",
-          "Disajikan dalam bentuk grafik garis pada bidang kartesius",
-          "Hasil penyelesaian berupa daerah arsiran",
-        ],
-      },
-      {
-        title: "Sistem Persamaan Dua Variabel",
-        theme: "blue",
-        points: [
-          "Gabungan dua atau lebih pertidaksamaan",
-          "Daerah penyelesaian adalah irisan dari beberapa daerah",
-          "Banyak digunakan dalam soal kontekstual (optimasi sederhana)",
-        ],
-      },
-    ],
-  },
-  insights: {
-    topics: [
-      "Pertidaksamaan Linear Dua Variabel",
-      "Sistem Pertidaksamaan",
-      "Grafik pada Bidang Kartesius",
-      "Daerah Penyelesaian",
-      "Titik Uji",
-      "Garis Batas",
-      "Arsiran Daerah",
-    ],
-    difficulties: [
-      {
-        title: "Menentukan Daerah Penyelesaian",
-        desc: "Siswa sering keliru menentukan sisi daerah yang harus diarsir.",
-      },
-      {
-        title: "Membedakan Tanda (<, ≤, >, ≥)",
-        desc: "Kesalahan umum pada penggunaan garis putus-putus dan garis penuh.",
-      },
-      {
-        title: "Sistem Pertidaksamaan",
-        desc: "Siswa kesulitan memahami irisan dari beberapa daerah sekaligus.",
-      },
-    ],
-    recommendation: {
-      type: "Visual Learners",
-      points: [
-        "Gunakan grafik berwarna pada bidang kartesius",
-        "Tampilkan animasi proses arsiran daerah",
-        "Perlihatkan perbedaan garis putus-putus vs garis penuh",
-        "Sajikan contoh dan non-contoh secara berdampingan",
-        "Gunakan mind map atau diagram alur",
-        "Tampilkan proses pembuatan grafik secara bertahap",
-      ],
-    },
-  },
-};
-
-export default function MaterialSummaryPage({
+export default async function MaterialSummaryPage({
   params,
 }: {
   params: Promise<{ classId: string; materialId: string }>;
 }) {
-  const { classId } = use(params);
+  const { classId, materialId } = await params;
+
+  // Fetch Real Analysis Data
+  const analysis = await getAnalysis(materialId);
+
+  if (!analysis) {
+    // Handling not found - maybe redirect to upload or show error
+    redirect(`/dashboard/classes/${classId}/analysis`);
+  }
+
+  const {
+    summary,
+    class_level,
+    grade_number,
+    learning_method,
+    created_at,
+    file_name,
+  } = analysis;
+  const timeAgo = formatDistanceToNow(new Date(created_at), {
+    addSuffix: true,
+    locale: idLocale,
+  });
 
   return (
     <div className="font-sans max-w-full space-y-8 pb-32">
@@ -117,21 +54,21 @@ export default function MaterialSummaryPage({
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
           <Link
-            href={`/dashboard/classes/${classId}`}
+            href={`/dashboard/classes/${classId}/analysis`}
             className="flex items-center gap-2 text-slate-500 hover:text-slate-700 w-fit transition-colors mb-2 group"
           >
             <div className="p-1 rounded-full bg-slate-100 group-hover:bg-slate-200 transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </div>
-            <span className="text-sm font-medium">Kembali ke Materi</span>
+            <span className="text-sm font-medium">Unggah Materi Lain</span>
           </Link>
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-gray-900">
               Ringkasan & Insight Materi
             </h1>
             <p className="text-slate-500">
-              Unggah materi pembelajaran dan dapatkan ringkasan serta insight
-              lanjutan berbasis AI.
+              Analisis AI telah selesai. Berikut adalah ringkasan dan
+              rekomendasi pengajaran.
             </p>
           </div>
         </div>
@@ -145,7 +82,7 @@ export default function MaterialSummaryPage({
             <div className="flex items-center gap-2 text-sm">
               <span className="text-slate-500 font-medium">Tingkat:</span>
               <span className="font-bold text-slate-700">
-                {summaryData.meta.level}
+                {class_level} Kelas {grade_number}
               </span>
             </div>
           </div>
@@ -160,8 +97,8 @@ export default function MaterialSummaryPage({
               <span className="text-slate-500 font-medium">
                 Metode Belajar:
               </span>
-              <span className="font-bold text-slate-700">
-                {summaryData.meta.method}
+              <span className="font-bold text-slate-700 capitalize">
+                {learning_method}
               </span>
             </div>
           </div>
@@ -174,8 +111,8 @@ export default function MaterialSummaryPage({
             </div>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-slate-500 font-medium">Dianalisa:</span>
-              <span className="font-bold text-slate-700">
-                {summaryData.meta.time}
+              <span className="font-bold text-slate-700 capitalize">
+                {timeAgo}
               </span>
             </div>
           </div>
@@ -191,13 +128,11 @@ export default function MaterialSummaryPage({
           <FileText className="w-8 h-8" />
         </div>
 
-        <h3 className="text-lg font-bold text-gray-900 mb-4">
-          {summaryData.file.name}
-        </h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">{file_name}</h3>
 
         <div className="flex items-center gap-2 text-green-600 font-bold text-sm bg-green-50 px-4 py-2 rounded-full">
           <CheckCircle2 className="w-5 h-5 fill-green-600 text-white" />
-          {summaryData.file.status}
+          File Berhasil Dianalisa
         </div>
       </div>
 
@@ -210,36 +145,38 @@ export default function MaterialSummaryPage({
 
         {/* Intro Box */}
         <div className="bg-[#F0FDFA] rounded-lg p-6 text-slate-700 leading-relaxed text-sm border border-[#317C74]/10">
-          {summaryData.summary.intro}
+          <p>{summary.material.description}</p>
         </div>
 
         {/* Comparison Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {summaryData.summary.compare.map((card, idx) => (
+          {summary.material.sections.map((card: any, idx: number) => (
             <div
               key={idx}
               className={`rounded-xl p-6 ${
-                card.theme === "yellow"
+                card.backgroundColor === "yellow"
                   ? "bg-[#FFFBEB]" // Amber-50
                   : "bg-[#EFF6FF]" // Blue-50
               }`}
             >
               <h4
                 className={`font-bold mb-4 text-sm ${
-                  card.theme === "yellow" ? "text-amber-950" : "text-blue-950"
+                  card.backgroundColor === "yellow"
+                    ? "text-amber-950"
+                    : "text-blue-950"
                 }`}
               >
                 {card.title}
               </h4>
               <ul className="space-y-3">
-                {card.points.map((point, k) => (
+                {card.points.map((point: string, k: number) => (
                   <li
                     key={k}
                     className="flex gap-3 text-sm text-slate-700 items-start"
                   >
                     <div
                       className={`mt-0.5 shrink-0 ${
-                        card.theme === "yellow"
+                        card.backgroundColor === "yellow"
                           ? "text-orange-500"
                           : "text-blue-500"
                       }`}
@@ -271,7 +208,7 @@ export default function MaterialSummaryPage({
             Topik Utama
           </div>
           <div className="flex flex-wrap gap-2">
-            {summaryData.insights.topics.map((topic, i) => (
+            {summary.insights.mainTopics.map((topic: string, i: number) => (
               <span
                 key={i}
                 className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-xs font-semibold"
@@ -289,7 +226,7 @@ export default function MaterialSummaryPage({
             Bagian yang Berpotensi Sulit Dipahami
           </h4>
           <div className="space-y-3">
-            {summaryData.insights.difficulties.map((diff, i) => (
+            {summary.insights.difficultAreas.map((diff: any, i: number) => (
               <div
                 key={i}
                 className="bg-[#FEF2F2] border-l-4 border-red-400 p-4 rounded-r-lg"
@@ -298,7 +235,7 @@ export default function MaterialSummaryPage({
                   {diff.title}
                 </h5>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  {diff.desc}
+                  {diff.explanation}
                 </p>
               </div>
             ))}
@@ -312,36 +249,70 @@ export default function MaterialSummaryPage({
             Rekomendasi Metode Mengajar
           </h4>
 
-          <div className="bg-[#F0FDFA] rounded-xl p-6 border border-teal-50">
-            <div className="inline-flex items-center gap-2 bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-bold mb-4">
-              <Eye className="w-3 h-3" />
-              Visual Learners
-            </div>
+          {summary.insights.teachingRecommendations.map(
+            (rec: any, idx: number) => (
+              <div
+                key={idx}
+                className="bg-[#F0FDFA] rounded-xl p-6 border border-teal-50"
+              >
+                <div className="inline-flex items-center gap-2 bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-bold mb-4">
+                  <Eye className="w-3 h-3" />
+                  {rec.learningStyle}
+                </div>
 
-            <ul className="grid md:grid-cols-2 gap-x-8 gap-y-2">
-              {summaryData.insights.recommendation.points.map((pt, i) => (
-                <li
-                  key={i}
-                  className="flex gap-2 text-sm text-slate-700 items-start"
-                >
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                  <span>{pt}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+                <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
+                  {/* Methods */}
+                  <div>
+                    <h5 className="font-bold text-slate-800 text-xs mb-2">
+                      Metode:
+                    </h5>
+                    <ul className="space-y-2">
+                      {rec.methods.map((pt: string, i: number) => (
+                        <li
+                          key={i}
+                          className="flex gap-2 text-sm text-slate-700 items-start"
+                        >
+                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  {/* Suggestions */}
+                  <div>
+                    <h5 className="font-bold text-slate-800 text-xs mb-2">
+                      Saran Praktis:
+                    </h5>
+                    <ul className="space-y-2">
+                      {rec.suggestions.map((pt: string, i: number) => (
+                        <li
+                          key={i}
+                          className="flex gap-2 text-sm text-slate-700 items-start"
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-[#317C74] mt-0.5 shrink-0" />
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )
+          )}
         </div>
       </div>
 
       {/* Footer Actions */}
       <div className="fixed bottom-8 right-8 flex items-center gap-4 z-50">
-        <Button
-          variant="outline"
-          className="bg-white hover:bg-slate-50 border-slate-200 text-slate-700 font-medium px-6 h-12 rounded-xl shadow-lg"
-        >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Analisa Ulang
-        </Button>
+        <Link href={`/dashboard/classes/${classId}/analysis`}>
+          <Button
+            variant="outline"
+            className="bg-white hover:bg-slate-50 border-slate-200 text-slate-700 font-medium px-6 h-12 rounded-xl shadow-lg"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Analisa Ulang
+          </Button>
+        </Link>
         <Button className="bg-[#317C74] hover:bg-[#2A6B63] text-white font-bold px-6 h-12 rounded-xl shadow-lg shadow-teal-900/20">
           <Download className="w-4 h-4 mr-2" />
           Unduh Ringkasan
