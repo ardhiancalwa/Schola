@@ -2,9 +2,29 @@
 
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export function StudentToolbar() {
+interface StudentToolbarProps {
+  classes: { id: string; label: string }[];
+  selectedClassId: string;
+  onClassChange: (id: string) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+}
+
+export function StudentToolbar({
+  classes,
+  selectedClassId,
+  onClassChange,
+  searchQuery,
+  onSearchChange,
+}: StudentToolbarProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4">
       <div className="relative flex-1">
@@ -12,13 +32,23 @@ export function StudentToolbar() {
         <Input
           placeholder="Temukan siswa berdasarkan Nama atau NIS"
           className="pl-10 rounded-full border-slate-300 bg-white"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      <div className="w-full sm:w-[150px]">
-        <Select className="rounded-full border-slate-300 bg-white">
-          <option>X A</option>
-          <option>X B</option>
-          <option>XI A</option>
+      <div className="w-full sm:w-[200px]">
+        <Select value={selectedClassId} onValueChange={onClassChange}>
+          <SelectTrigger className="rounded-full border-slate-300 bg-white">
+            <SelectValue placeholder="Pilih Kelas" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Kelas</SelectItem>
+            {classes.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
       </div>
     </div>

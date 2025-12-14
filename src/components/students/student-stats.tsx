@@ -1,38 +1,50 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ClipboardList, FileText, UserMinus, Users } from "lucide-react";
 
-const stats = [
-  {
-    label: "Total Siswa",
-    value: "120 Siswa",
-    icon: Users,
-    color: "text-teal-600",
-    bg: "bg-teal-50",
-  },
-  {
-    label: "Kehadiran",
-    value: "85%",
-    icon: ClipboardList,
-    color: "text-yellow-600",
-    bg: "bg-yellow-50",
-  },
-  {
-    label: "Tugas",
-    value: "80%",
-    icon: FileText,
-    color: "text-purple-600",
-    bg: "bg-purple-50",
-  },
-  {
-    label: "Butuh Bimbingan",
-    value: "3 Siswa",
-    icon: UserMinus,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-  },
-];
+interface StudentStatsProps {
+  totalStudents: number;
+  avgAttendance: number;
+  avgGrade: number;
+  needHelpCount: number;
+}
 
-export function StudentStats() {
+export function StudentStats({
+  totalStudents,
+  avgAttendance,
+  avgGrade,
+  needHelpCount,
+}: StudentStatsProps) {
+  const stats = [
+    {
+      label: "Total Siswa",
+      value: `${totalStudents} Siswa`,
+      icon: Users,
+      color: "text-teal-600",
+      bg: "bg-teal-50",
+    },
+    {
+      label: "Kehadiran",
+      value: `${avgAttendance}%`,
+      icon: ClipboardList,
+      color: "text-yellow-600",
+      bg: "bg-yellow-50",
+    },
+    {
+      label: "Tugas", // Represents Avg Grade/Task Score
+      value: `${avgGrade}%`,
+      icon: FileText,
+      color: "text-purple-600",
+      bg: "bg-purple-50",
+    },
+    {
+      label: "Butuh Bimbingan",
+      value: `${needHelpCount} Siswa`,
+      icon: UserMinus,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat) => {

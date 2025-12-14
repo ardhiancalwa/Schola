@@ -1,26 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { forgotPassword } from "@/lib/actions/auth";
+import { toast } from "sonner";
 import Image from "next/image";
 import forgotPasswordImage from "../../../public/assets/images/forgot-password.svg";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [isSent, setIsSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    setIsLoading(false);
-    setIsSent(true);
+    startTransition(async () => {
+      const result = await forgotPassword(email);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        setIsSent(true);
+        toast.success("Tautan reset password berhasil dikirim!");
+      }
+    });
   };
 
   return (
@@ -28,17 +32,10 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-[500px] flex flex-col items-center text-center">
         {/* Illustration */}
         <div className="mb-8 relative w-[200px] h-[150px] flex items-center justify-center">
-          {/* 
-                Placeholder for "Laptop with Lock" vector.
-                Using a relevant placeholder image.
-            */}
           <Image
             src={forgotPasswordImage}
             alt="Forgot Password Illustration"
-            fill
-            className="object-contain w-full h-full opacity-90 hover:scale-105 transition-transform duration-500"
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-contain w-full h-full"
           />
         </div>
 
@@ -66,9 +63,9 @@ export default function ForgotPasswordPage() {
             <Button
               type="submit"
               className="w-full h-12 bg-[#317C74] hover:bg-[#2A6B63] text-white text-base font-bold rounded-lg transition-all shadow-md hover:shadow-lg"
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? "Mengirim..." : "Kirim"}
+              {isPending ? "Mengirim..." : "Kirim"}
             </Button>
           </form>
         ) : (

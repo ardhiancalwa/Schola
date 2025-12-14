@@ -1,7 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowUp, ArrowDown, CheckCircle2 } from "lucide-react";
+import { ReportStatsData } from "@/lib/actions/report";
 
-export function ReportStats() {
+interface ReportStatsProps {
+  stats: ReportStatsData;
+}
+
+export function ReportStats({ stats }: ReportStatsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Card 1: Rata-Rata Nilai */}
@@ -12,19 +17,22 @@ export function ReportStats() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-primary mb-2">76,5</div>
-          {/* Progress Bar */}
+          <div className="text-3xl font-bold text-primary mb-2">
+            {stats.averageScore}
+          </div>
+          {/* Progress Bar (Arbitrary scale for visual, assuming 100 max) */}
           <div className="h-2 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
             <div
               className="h-full bg-secondary rounded-full"
-              style={{ width: "76.5%" }}
+              style={{ width: `${stats.averageScore}%` }}
             ></div>
           </div>
           <div className="flex items-center gap-1 text-xs font-semibold text-success">
+            {/* Trends are placeholders in backend for now */}
             <ArrowUp className="w-3 h-3" />
-            <span>+8.5%</span>
+            <span>+0%</span>
             <span className="text-slate-400 font-normal ml-1">
-              Meningkat dari Semester Lalu
+              Stabil dari Semester Lalu
             </span>
           </div>
         </CardContent>
@@ -38,19 +46,21 @@ export function ReportStats() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-primary mb-2">90%</div>
+          <div className="text-3xl font-bold text-primary mb-2">
+            {stats.attendanceRate}%
+          </div>
           {/* Progress Bar */}
           <div className="h-2 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
             <div
               className="h-full bg-secondary rounded-full"
-              style={{ width: "90%" }}
+              style={{ width: `${stats.attendanceRate}%` }}
             ></div>
           </div>
-          <div className="flex items-center gap-1 text-xs font-semibold text-danger">
-            <ArrowDown className="w-3 h-3" />
-            <span>+2.5%</span>
+          <div className="flex items-center gap-1 text-xs font-semibold text-success">
+            <ArrowUp className="w-3 h-3" />
+            <span>+0%</span>
             <span className="text-slate-400 font-normal ml-1">
-              Menurun dari Semester Lalu
+              Stabil dari Semester Lalu
             </span>
           </div>
         </CardContent>
@@ -64,17 +74,19 @@ export function ReportStats() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-primary mb-2">80%</div>
+          <div className="text-3xl font-bold text-primary mb-2">
+            {stats.submissionRate}%
+          </div>
           {/* Progress Bar */}
           <div className="h-2 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
             <div
               className="h-full bg-secondary rounded-full"
-              style={{ width: "80%" }}
+              style={{ width: `${stats.submissionRate}%` }}
             ></div>
           </div>
           <div className="flex items-center gap-1 text-xs font-medium text-slate-500">
             <CheckCircle2 className="w-3 h-3 text-primary" />
-            <span>24 dari 30 Tugas Telah Dikumpulkan</span>
+            <span>Tingkat pengumpulan tugas</span>
           </div>
         </CardContent>
       </Card>

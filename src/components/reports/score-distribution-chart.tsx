@@ -19,20 +19,13 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-const data = [
-  { range: "90-100", count: 5 },
-  { range: "80-89", count: 10 },
-  { range: "70-79", count: 20 },
-  { range: "60-69", count: 5 },
-  { range: "50-59", count: 0 },
-  { range: "40-49", count: 0 },
-  { range: "30-39", count: 0 },
-  { range: "20-29", count: 0 },
-  { range: "10-19", count: 0 },
-  { range: "0-9", count: 0 },
-];
+import { ScoreDistributionItem } from "@/lib/actions/report";
 
-export function ScoreDistributionChart() {
+interface ScoreDistributionChartProps {
+  data: ScoreDistributionItem[];
+}
+
+export function ScoreDistributionChart({ data }: ScoreDistributionChartProps) {
   return (
     <Card className="shadow-sm border-none rounded-xl h-full">
       <CardHeader>

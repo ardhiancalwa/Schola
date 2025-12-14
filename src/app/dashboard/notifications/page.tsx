@@ -110,7 +110,7 @@ export default function NotificationsPage() {
   });
 
   return (
-    <div className="space-y-6 pb-10 font-sans max-w-5xl">
+    <div className="space-y-6 pb-10 font-sans max-w-full">
       <h2 className="text-2xl font-bold text-neutral">Notifikasi</h2>
 
       {/* --- Hero Banner --- */}

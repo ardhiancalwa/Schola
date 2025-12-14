@@ -1,52 +1,67 @@
-import { ChartLine, Clipboard, Notebook, Users } from "lucide-react";
+import { GraduationCap, Users, BookOpen, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-export function ClassStats() {
+export function ClassStats({
+  avgGrade = "0",
+  attendance = "0%",
+  assignments = "0%",
+  needsHelp = 0,
+}: {
+  avgGrade?: string;
+  attendance?: string;
+  assignments?: string;
+  needsHelp?: number;
+}) {
   const stats = [
     {
-      label: "Nilai",
-      value: "86.4",
-      trend: "+8.5%",
+      label: "Rata-rata Nilai",
+      value: avgGrade,
+      trend: "+2.5%",
       trendUp: true,
-      icon: ChartLine,
+      icon: GraduationCap,
       color: "text-[#317C74]",
-      bgColor: "bg-[#F0FDF9]",
+      bgColor: "bg-teal-50",
+      simple: false,
     },
     {
       label: "Kehadiran",
-      value: "85%",
-      trend: "-2%",
-      trendUp: false,
-      icon: Clipboard,
-      color: "text-amber-500",
-      bgColor: "bg-[#FFFBEB]",
-    },
-    {
-      label: "Tugas",
-      value: "80%",
-      trend: "+8.5%",
+      value: attendance,
+      trend: "+1.2%",
       trendUp: true,
-      icon: Notebook,
-      color: "text-purple-500",
-      bgColor: "bg-[#F3E8FF]",
+      icon: Users,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      simple: false,
     },
     {
-      label: "Butuh Bimbingan",
-      value: "3 Siswa",
-      icon: Users,
-      color: "text-blue-500",
-      bgColor: "bg-[#EFF6FF]",
+      label: "Pengumpulan Tugas",
+      value: assignments,
+      trend: "-5%",
+      trendUp: false,
+      icon: BookOpen,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      simple: false,
+    },
+    {
+      label: "Perlu Bimbingan",
+      value: `${needsHelp} Siswa`,
+      trend: "Neutral",
+      trendUp: true, // Mock
+      icon: AlertCircle,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
       simple: true,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {stats.map((stat, i) => (
         <Card
           key={i}
-          className="p-6 border-none shadow-sm flex items-center justify-between rounded-xl"
+          className="p-6 border-slate-100 shadow-sm flex items-center justify-between rounded-xl hover:shadow-md transition-shadow"
         >
           <div className="space-y-1">
             <p className="text-slate-500 font-medium text-sm">{stat.label}</p>

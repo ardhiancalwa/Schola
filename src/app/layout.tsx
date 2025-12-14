@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const poppins = Poppins({
-  subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
   variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
-  title: "Schola Dashboard",
-  description: "Advanced Learning Management System",
+  title: "Schola - Platform Manajemen Pendidikan",
+  description: "Kelola Kelas dan Perkembangan Siswa dengan Mudah",
 };
 
 export default function RootLayout({
@@ -19,8 +21,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${poppins.variable} font-sans antialiased`}>{children}</body>
+    <html lang="id">
+      <body
+        className={`${poppins.variable} font-sans antialiased text-neutral`}
+      >
+        {children}
+        <Toaster position="top-center" richColors />
+      </body>
     </html>
   );
 }

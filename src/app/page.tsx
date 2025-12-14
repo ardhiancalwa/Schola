@@ -1,42 +1,63 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Eye, EyeOff, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { login } from "@/lib/actions/auth";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import loginImage from "../../public/assets/images/auth.svg";
-import logo from "../../public/assets/images/logo.png";
+import authImage from "../../public/assets/images/auth.svg";
+
+const loginSchema = z.object({
+  email: z.string().email("Format email tidak valid"),
+  password: z.string().min(1, "Kata sandi diperlukan"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-    // Simulate login delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const onSubmit = (data: LoginFormValues) => {
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("password", data.password);
 
-    setIsLoading(false);
-    router.push("/dashboard");
+      const result = await login(formData);
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        // Redirect is handled in server action
+        toast.success("Login berhasil!");
+      }
+    });
   };
 
   return (
     <div className="flex min-h-screen w-full font-sans">
       {/* Left Column - Hero Section */}
       <div className="hidden lg:flex w-1/2 bg-[#317C74] flex-col justify-between p-12 text-white relative overflow-hidden">
-        {/* Decorative Circles/Background Elements could go here */}
-
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <Image src={logo} alt="Logo" />
+          <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+            <GraduationCap className="h-8 w-8 text-white" />
+          </div>
+          <span className="text-2xl font-bold tracking-tight">Schola</span>
         </div>
 
         {/* Content */}
@@ -50,18 +71,11 @@ export default function LoginPage() {
           </p>
 
           {/* Illustration Placeholder */}
-          <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden flex items-center justify-center">
-            {/* 
-                    In a real app, use the specific illustration asset. 
-                    Using a placeholder concept here as requested.
-                 */}
+          <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden  flex items-center justify-center">
             <Image
-              src={loginImage}
+              src={authImage}
               alt="Teacher Illustration"
-              fill // Menggantikan w-full h-full, otomatis isi container parent
-              className="object-contain opacity-90 hover:scale-105 transition-transform duration-500"
-              priority // Wajib jika ini gambar utama (hero) biar loading instan
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Optimasi ukuran
+              className="object-contain w-full h-full opacity-90 hover:scale-105 transition-transform duration-500"
             />
           </div>
         </div>
@@ -82,7 +96,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
               <label
                 className="text-sm font-semibold text-neutral"
@@ -94,11 +108,16 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="Masukkan email Anda"
-                className="h-12 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74]"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                className={`h-12 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74] ${
+                  errors.email
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : ""
+                }`}
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-xs text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -113,10 +132,12 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Masukkan kata sandi Anda"
-                  className="h-12 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74] pr-10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  className={`h-12 border-slate-200 focus:border-[#317C74] focus:ring-[#317C74] pr-10 ${
+                    errors.password
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                      : ""
+                  }`}
+                  {...register("password")}
                 />
                 <button
                   type="button"
@@ -130,6 +151,12 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-xs text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
+
               <div className="flex justify-end">
                 <Link
                   href="/forgot-password"
@@ -143,9 +170,9 @@ export default function LoginPage() {
             <Button
               type="submit"
               className="w-full h-12 bg-[#317C74] hover:bg-[#2A6B63] text-white text-base font-bold rounded-lg transition-all"
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? "Memuat..." : "Masuk"}
+              {isPending ? "Masuk..." : "Masuk"}
             </Button>
           </form>
 
