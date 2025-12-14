@@ -13,6 +13,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import authImage from "../../../public/assets/images/auth.svg";
+import scholaLogo from "../../../public/assets/images/logo.png";
 
 const registerSchema = z
   .object({
@@ -65,10 +66,17 @@ export default function RegisterPage() {
       <div className="hidden lg:flex w-1/2 bg-[#317C74] flex-col justify-between p-12 text-white relative overflow-hidden">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-            <GraduationCap className="h-8 w-8 text-white" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight">Schola</span>
+          <div className="flex items-center gap-3">
+          <Image
+            src={scholaLogo}
+            alt="Schola Logo"
+            width={150}
+            height={60}
+            className="object-contain"
+            priority
+          />
+        </div>
+
         </div>
 
         {/* Content */}

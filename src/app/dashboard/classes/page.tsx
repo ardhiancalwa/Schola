@@ -135,7 +135,19 @@ export default function ClassesPage() {
     return matchLevel && matchSubject;
   });
 
-  if (loading) return <div className="p-8">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="p-8 space-y-4 animate-pulse">
+        <div className="h-8 bg-linear-to-r from-teal-100 to-teal-50 rounded-lg w-3/4" />
+        <div className="h-4 bg-linear-to-r from-teal-100 to-teal-50 rounded w-1/2" />
+        <div className="space-y-2 pt-4">
+          <div className="h-4 bg-linear-to-r from-teal-100 to-teal-50 rounded" />
+          <div className="h-4 bg-linear-to-r from-teal-100 to-teal-50 rounded w-5/6" />
+          <div className="h-4 bg-linear-to-r from-teal-100 to-teal-50 rounded w-4/6" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="font-sans max-w-full min-h-screen pb-20">

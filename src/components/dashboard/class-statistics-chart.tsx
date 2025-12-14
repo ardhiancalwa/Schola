@@ -1,96 +1,124 @@
-"use client"
+"use client";
 
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import * as React from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const data = [
-  {
-    name: "XI A",
-    grades: 90,
-    attendance: 80,
-  },
-  {
-    name: "XI B",
-    grades: 80,
-    attendance: 95,
-  },
-  {
-    name: "XI C",
-    grades: 81,
-    attendance: 90,
-  },
-  {
-    name: "XI D",
-    grades: 70,
-    attendance: 95,
-  },
-]
+interface ClassStatisticsChartProps {
+  data: {
+    name: string;
+    grades: number;
+    attendance: number;
+  }[];
+  classList?: { id: string; name: string }[];
+}
 
-export function ClassStatisticsChart() {
+export function ClassStatisticsChart({
+  data,
+  classList = [],
+}: ClassStatisticsChartProps) {
+  const [selectedClassId, setSelectedClassId] = React.useState<string>("all");
+
+  const filteredData = React.useMemo(() => {
+    if (selectedClassId === "all") return data;
+    const selectedClass = classList.find((c) => c.id === selectedClassId);
+    if (!selectedClass) return data;
+    return data.filter((d) => d.name === selectedClass.name);
+  }, [data, selectedClassId, classList]);
+
   return (
     <Card className="border border-slate-100 shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-bold text-neutral">Statistik Kelas</CardTitle>
-        <span className="text-sm font-medium text-slate-500 cursor-pointer flex items-center gap-1">
-             Kelas XI 
-             <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#64748B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </span>
+        <CardTitle className="text-lg font-bold text-neutral">
+          Statistik Kelas
+        </CardTitle>
+        <div className="w-[140px]">
+          <Select value={selectedClassId} onValueChange={setSelectedClassId}>
+            <SelectTrigger className="h-8 text-xs border-slate-200 focus:ring-[#317C74]">
+              <SelectValue placeholder="Semua Kelas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Kelas</SelectItem>
+              {classList.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-[300px] w-full mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={data}
-              margin={{
-                top: 5,
-                right: 5,
-                left: 0,
-                bottom: 5,
-              }}
+              data={filteredData}
+              margin={{ top: 5, right: 25, left: -20, bottom: 5 }}
               barGap={8}
             >
-              <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis 
-                dataKey="name" 
-                stroke="#64748b" 
-                fontSize={12} 
-                tickLine={false} 
+              <CartesianGrid
+                vertical={false}
+                strokeDasharray="3 3"
+                stroke="#f1f5f9"
+              />
+              <XAxis
+                dataKey="name"
+                stroke="#64748b"
+                fontSize={12}
+                tickLine={false}
                 axisLine={false}
                 dy={10}
               />
-              <YAxis 
-                stroke="#64748b" 
-                fontSize={12} 
-                tickLine={false} 
+              <YAxis
+                stroke="#64748b"
+                fontSize={12}
+                tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => `${value}%`}
               />
-              <Tooltip 
-                 cursor={{ fill: 'transparent' }}
-                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+              <Tooltip
+                cursor={{ fill: "transparent" }}
+                contentStyle={{
+                  borderRadius: "8px",
+                  border: "none",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                }}
               />
-              <Legend 
-                  wrapperStyle={{ paddingTop: '20px' }}
-                  iconType="rect" 
-              />
-              <Bar 
+              <Legend wrapperStyle={{ paddingTop: "20px" }} iconType="rect" />
+              <Bar
                 name="Rata-Rata Nilai"
-                dataKey="grades" 
-                fill="#317C74" 
-                radius={[4, 4, 0, 0]} 
-                barSize={24}
+                dataKey="grades"
+                fill="#317C74"
+                radius={[4, 4, 0, 0]}
+                barSize={32}
               />
-              <Bar 
+              <Bar
                 name="Kehadiran"
-                dataKey="attendance" 
-                fill="#FFA102" 
-                radius={[4, 4, 0, 0]} 
-                barSize={24}
+                dataKey="attendance"
+                fill="#FFA102"
+                radius={[4, 4, 0, 0]}
+                barSize={32}
               />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

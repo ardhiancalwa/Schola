@@ -21,6 +21,18 @@ export type CreateClassPayload = {
   studentsData: StudentData[];
 };
 
+export async function getClassDetails(classId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("classes")
+    .select("*")
+    .eq("id", classId)
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
 export async function createClassWithStudents(payload: CreateClassPayload) {
   const supabase = await createClient();
 
