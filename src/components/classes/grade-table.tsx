@@ -3,14 +3,13 @@
 import {
   Search,
   ChevronDown,
-  Download,
   MonitorUp,
   Trash2,
   Pencil,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -20,8 +19,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
-// Needs to be large enough to show scrolling or pagination visual
 const STUDENTS = [
   {
     id: "1",
@@ -36,7 +35,7 @@ const STUDENTS = [
   },
   {
     id: "2",
-    nis: "5022730581",
+    nis: "5022814693", // Using same NIS as per dummy data request/image
     name: "Chintia Putri",
     attendance: 90,
     t1: 85,
@@ -47,7 +46,7 @@ const STUDENTS = [
   },
   {
     id: "3",
-    nis: "5022965207",
+    nis: "5022814693",
     name: "Chintia Putri",
     attendance: 80,
     t1: 80,
@@ -58,7 +57,7 @@ const STUDENTS = [
   },
   {
     id: "4",
-    nis: "5022483016",
+    nis: "5022814693",
     name: "Chintia Putri",
     attendance: 80,
     t1: 80,
@@ -69,7 +68,7 @@ const STUDENTS = [
   },
   {
     id: "5",
-    nis: "5022129754",
+    nis: "5022814693",
     name: "Chintia Putri",
     attendance: 75,
     t1: 80,
@@ -80,7 +79,7 @@ const STUDENTS = [
   },
   {
     id: "6",
-    nis: "5022570492",
+    nis: "5022814693",
     name: "Chintia Putri",
     attendance: 70,
     t1: 75,
@@ -91,7 +90,7 @@ const STUDENTS = [
   },
   {
     id: "7",
-    nis: "5022648301",
+    nis: "5022814693",
     name: "Chintia Putri",
     attendance: 65,
     t1: 65,
@@ -122,45 +121,50 @@ export function GradeTable() {
             <MonitorUp className="w-4 h-4" /> Nilai Terbesar
           </Button>
         </div>
+
+        {/* User requested Action button in Page Header, but also potentially here. 
+            Keeping toolbar clean or moving Export Here if needed. 
+            For now, following the specific "Students Table" reqs from prompt which matches standard table toolbar.
+        */}
       </div>
 
       {/* Table */}
-      <div className="rounded-md border border-slate-100">
+      <div className="rounded-md border border-slate-100 overflow-hidden">
         <Table>
           <TableHeader className="bg-slate-50/50">
             <TableRow>
-              <TableHead className="w-[120px] font-bold text-neutral">
+              <TableHead className="w-[120px] font-bold text-slate-500">
                 NIS
               </TableHead>
-              <TableHead className="font-bold text-neutral min-w-[200px]">
+              <TableHead className="font-bold text-slate-500 min-w-[200px]">
                 Nama Lengkap
               </TableHead>
-              <TableHead className="font-bold text-neutral text-center">
+              <TableHead className="font-bold text-slate-500 text-center">
                 Kehadiran
               </TableHead>
-              <TableHead className="font-bold text-neutral text-center">
+              <TableHead className="font-bold text-slate-500 text-center">
                 Tugas 1
               </TableHead>
-              <TableHead className="font-bold text-neutral text-center">
+              <TableHead className="font-bold text-slate-500 text-center">
                 Tugas 2
               </TableHead>
-              <TableHead className="font-bold text-neutral text-center">
+              <TableHead className="font-bold text-slate-500 text-center">
                 UTS
               </TableHead>
-              <TableHead className="font-bold text-neutral text-center">
+              <TableHead className="font-bold text-slate-500 text-center">
                 UAS
               </TableHead>
-              <TableHead className="font-bold text-neutral text-center">
+              <TableHead className="font-bold text-slate-500 text-center">
                 Nilai Akhir
               </TableHead>
-              <TableHead className="font-bold text-neutral text-center">
+              <TableHead className="font-bold text-slate-500 text-center">
                 Aksi
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {STUDENTS.map((student) => (
-              <TableRow key={student.id}>
+            {STUDENTS.map((student, idx) => (
+              <TableRow key={idx}>
                 <TableCell className="font-medium text-slate-500">
                   {student.nis}
                 </TableCell>
@@ -183,7 +187,10 @@ export function GradeTable() {
 
                 {/* Scores */}
                 {[student.t1, student.t2, student.uts].map((score, i) => (
-                  <TableCell key={i} className="text-center font-medium">
+                  <TableCell
+                    key={i}
+                    className="text-center font-medium text-slate-600"
+                  >
                     <span
                       className={cn(
                         score >= 75 ? "text-[#317C74]" : "text-red-500"
@@ -235,44 +242,44 @@ export function GradeTable() {
         </Table>
       </div>
 
-      {/* Pagination (Simple Visual) */}
-      <div className="flex items-center justify-between mt-4">
+      {/* Pagination */}
+      <div className="flex items-center justify-between mt-6">
         <p className="text-sm text-slate-500">
           Menampilkan 1 - 5 dari total data
         </p>
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-slate-400"
+            className="h-8 w-8 text-slate-400 rounded-lg hover:bg-slate-50"
             disabled
           >
             <ChevronDown className="w-4 h-4 rotate-90" />
           </Button>
           <Button
             size="icon"
-            className="h-8 w-8 bg-[#317C74] rounded-full text-white hover:bg-[#2A6B63]"
+            className="h-8 w-8 bg-[#317C74] rounded-full text-white hover:bg-[#2A6B63] shadow-md shadow-teal-700/20"
           >
             1
           </Button>
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-slate-500 rounded-full bg-slate-100"
+            className="h-8 w-8 text-slate-500 rounded-full hover:bg-slate-100"
           >
             2
           </Button>
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-slate-500 rounded-full bg-slate-100"
+            className="h-8 w-8 text-slate-500 rounded-full hover:bg-slate-100"
           >
             3
           </Button>
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-slate-400"
+            className="h-8 w-8 text-slate-400 rounded-lg hover:bg-slate-50"
           >
             <ChevronDown className="w-4 h-4 -rotate-90" />
           </Button>

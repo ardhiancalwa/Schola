@@ -1,4 +1,4 @@
-import { ChartLine, Clipboard, Notebook, Users } from "lucide-react";
+import { ChartLine, ClipboardList, Book, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -11,42 +11,46 @@ export function ClassStats() {
       trendUp: true,
       icon: ChartLine,
       color: "text-[#317C74]",
-      bgColor: "bg-[#F0FDF9]",
+      bgColor: "bg-[#F0FDF9]", // Teal tint
+      borderColor: "border-[#317C74]/20",
     },
     {
       label: "Kehadiran",
       value: "85%",
       trend: "-2%",
       trendUp: false,
-      icon: Clipboard,
+      icon: ClipboardList,
       color: "text-amber-500",
-      bgColor: "bg-[#FFFBEB]",
+      bgColor: "bg-[#FFFBEB]", // Yellow tint
+      borderColor: "border-amber-200",
     },
     {
       label: "Tugas",
       value: "80%",
       trend: "+8.5%",
       trendUp: true,
-      icon: Notebook,
+      icon: Book,
       color: "text-purple-500",
-      bgColor: "bg-[#F3E8FF]",
+      bgColor: "bg-[#F3E8FF]", // Purple tint
+      borderColor: "border-purple-200",
     },
     {
       label: "Butuh Bimbingan",
       value: "3 Siswa",
       icon: Users,
       color: "text-blue-500",
-      bgColor: "bg-[#EFF6FF]",
+      bgColor: "bg-[#EFF6FF]", // Blue tint
+      borderColor: "border-blue-200",
       simple: true,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {stats.map((stat, i) => (
         <Card
           key={i}
-          className="p-6 border-none shadow-sm flex items-center justify-between rounded-xl"
+          className="p-6 border-slate-100 shadow-sm flex items-center justify-between rounded-xl hover:shadow-md transition-shadow"
         >
           <div className="space-y-1">
             <p className="text-slate-500 font-medium text-sm">{stat.label}</p>
