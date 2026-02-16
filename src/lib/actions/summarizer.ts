@@ -2,81 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { uploadMaterialPDF } from "@/lib/supabase/storage";
-import { MaterialSummary, ClassLevel, LearningMethod } from "@/types/summarizer";
+import { ClassLevel } from "@/types/summarizer";
 import { normalizeLearningMethod } from "@/lib/learning-method-mapper";
-
-// Dummy Data Generator
-function generateDummySummary(fileName: string): MaterialSummary {
-  // We can customize title based on filename to make it feel real
-  const baseTitle = fileName.replace(/\.pdf|\.ppt|\.pptx/i, "").replace(/_/g, " ");
-  
-  return {
-    material: {
-      title: baseTitle || "Pertidaksamaan Dua Variabel",
-      description: "Pertidaksamaan dua variabel merupakan bentuk hubungan matematika yang melibatkan dua variabel (biasanya x dan y) dengan tanda ketidaksamaan. Materi ini digunakan untuk menentukan daerah penyelesaian yang memenuhi suatu kondisi tertentu.",
-      sections: [
-        {
-          title: "Pertidaksamaan Linear Dua Variabel",
-          backgroundColor: "yellow",
-          points: [
-            "Bentuk umum: ax + by < c, ax + by ≤ c, ax + by > c, ax + by ≥ c",
-            "Melibatkan dua variabel, biasanya x dan y",
-            "Disajikan dalam bentuk grafik garis pada bidang kartesius",
-            "Hasil penyelesaian berupa daerah arsiran"
-          ]
-        },
-        {
-          title: "Sistem Persamaan Dua Variabel",
-          backgroundColor: "blue",
-          points: [
-            "Gabungan dua atau lebih pertidaksamaan",
-            "Daerah penyelesaian adalah irisan dari beberapa daerah",
-            "Banyak digunakan dalam soal kontekstual (optimasi sederhana)"
-          ]
-        }
-      ]
-    },
-    insights: {
-      mainTopics: [
-        "Pertidaksamaan Linear",
-        "Sistem Pertidaksamaan", 
-        "Grafik Kartesius",
-        "Daerah Penyelesaian",
-        "Titik Uji",
-        "Garis Batas"
-      ],
-      difficultAreas: [
-        {
-          title: "Menentukan Daerah Penyelesaian",
-          explanation: "Siswa sering keliru menentukan sisi daerah yang harus diarsir."
-        },
-        {
-          title: "Membedakan Tanda (< vs ≤)",
-          explanation: "Kesalahan umum pada penggunaan garis putus-putus dan garis penuh."
-        },
-        {
-          title: "Sistem Pertidaksamaan",
-          explanation: "Siswa kesulitan memahami irisan dari beberapa daerah sekaligus."
-        }
-      ],
-      teachingRecommendations: [
-        {
-          learningStyle: "Visual Learners",
-          methods: [
-            "Gunakan grafik berwarna pada bidang kartesius",
-            "Tampilkan animasi proses arsiran daerah",
-            "Perlihatkan perbedaan garis putus-putus vs garis penuh"
-          ],
-          suggestions: [
-            "Sajikan contoh dan non-contoh secara berdampingan",
-            "Gunakan mind map atau diagram alur",
-            "Tampilkan proses pembuatan grafik secara bertahap"
-          ]
-        }
-      ]
-    }
-  };
-}
+import { summarizeWithGemini } from "@/lib/gemini-summarizer";
 
 export type AnalysisResult = 
   | { success: true; analysisId: string; materialId: string }
@@ -100,30 +28,30 @@ export async function analyzeMaterialAction(formData: FormData): Promise<Analysi
 
     if (!file || !classId) return { success: false, error: "Missing required fields" };
 
-    // 1. Upload File
+    // 1. Upload File to Supabase Storage
     const { path, fileName } = await uploadMaterialPDF(file, user.id);
     
-    // 2. Simulate Processing Delay (2 seconds)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // 2. Summarize with Gemini AI (real processing)
+    const startTime = Date.now();
+    const summary = await summarizeWithGemini(path, classLevel, gradeNumber, learningMethod);
+    const processingTime = (Date.now() - startTime) / 1000; // seconds
 
-    // 3. Generate Dummy Data
-    const summary = generateDummySummary(fileName);
-    const materialId = crypto.randomUUID(); // Mock material ID concept
+    const materialId = crypto.randomUUID();
 
-    // 4. Save to DB
+    // 3. Save to DB
     const { data, error } = await supabase
       .from("material_analyses")
       .insert({
         user_id: user.id,
         class_id: classId,
-        material_id: materialId, // Using a UUID as material_id
+        material_id: materialId,
         file_name: fileName,
         file_path: path,
         class_level: classLevel,
         grade_number: gradeNumber,
         learning_method: learningMethod,
         summary: summary,
-        processing_time: 2.5, // Fake seconds
+        processing_time: processingTime,
       })
       .select("id")
       .single();
@@ -143,7 +71,6 @@ export async function analyzeMaterialAction(formData: FormData): Promise<Analysi
 
 export async function getAnalysis(materialId: string) {
     const supabase = await createClient();
-    // We query by material_id column as per schema prompt
     const { data, error } = await supabase
         .from("material_analyses")
         .select("*")
